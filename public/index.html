@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html ng-app="app">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Green Man</title>
+</head>
+
+<body ng-controller="MainCtrl as mainCtrl">
+    <!-- 容器 -->
+    <div class="container">
+        <!-- 標頭 -->
+        <div class="page-header">
+            <h1 class="text-success"><small>so many </small>Green Man</h1>
+        </div>
+        <!-- 控制表單 -->
+        <form class="form" role="form" ng-submit="mainCtrl.send()" ng-init="mainCtrl.data.mode=0">
+            <!-- Mode -->
+            <div class="form-group">
+                <label>Mode</label>
+                <br>
+                <label>
+                    <input type="radio" name="mode" ng-model="mainCtrl.data.mode" value="0"> Scrolling Text - AAAAAAAAAAAAA
+                </label>
+                <br>
+                <label>
+                    <input type="radio" id="mode" name="mode" ng-model="mainCtrl.data.mode" value="1"> Ultrasound - AAAAAAAAAAAAAAAAAA
+                </label>
+                <br>
+                <label>
+                    <input type="radio" name="mode" ng-model="mainCtrl.data.mode" value="2"> Just Display - AAAAAAAAAAAAAAAAAAA
+                </label>
+            </div>
+            <!-- Message -->
+            <div class="form-group">
+                <label for="message" class="control-label">Message</label>
+                <input type="text" class="form-control" id="message" placeholder="Message" ng-model="mainCtrl.data.message" ng-required="(mainCtrl.data.mode==0)" ng-disabled="(mainCtrl.data.mode!=0)">
+            </div>
+            <!-- Submit -->
+            <div class="form-group">
+                <button type="submit" class="btn btn-default">Move it</button>
+            </div>
+        </form>
+    </div>
+    <!-- 載入 -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+</body>
+
+</html>
+<script>
+angular.module('app', [])
+
+.controller('MainCtrl', ['$http', function($http) {
+
+    var self = this;
+
+    self.send = function() {
+        console.log(self.data);
+
+        $http.post('/api/form', self.data)
+
+        .then(function(resopnse) {
+            console.log(resopnse.data);
+
+        }, function(err) {
+            console.error(err);
+        });
+
+
+    };
+
+}]);
+</script>
