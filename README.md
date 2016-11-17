@@ -11,14 +11,14 @@
 
 ## 使用
 1. 啟動伺服器
-	```
+
 	cd GreenMan
 	node server.js
-	```
+	
 2. 進入WebApp
-	```
+
 	網址: 127.0.0.1:8080
-	```
+	
 
 ## 組態
 - Baudrate 115200
