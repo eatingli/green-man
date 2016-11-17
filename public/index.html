@@ -19,28 +19,46 @@
         <form class="form" role="form" ng-submit="mainCtrl.send()" ng-init="mainCtrl.data.mode=0">
             <!-- Mode -->
             <div class="form-group">
-                <label>Mode</label>
+                <label>Function</label>
+                <span class="label label-warning">Watch</span>
                 <br>
                 <label>
-                    <input type="radio" name="mode" ng-model="mainCtrl.data.mode" value="0"> Scrolling Text - AAAAAAAAAAAAA
+                    <input type="radio" ng-model="mainCtrl.data.mode" value="0"> Scrolling Text - AAAAAAAAAAAAA
                 </label>
                 <br>
                 <label>
-                    <input type="radio" id="mode" name="mode" ng-model="mainCtrl.data.mode" value="1"> Ultrasound - AAAAAAAAAAAAAAAAAA
+                    <input type="radio" ng-model="mainCtrl.data.mode" value="1"> Ultrasound - AAAAAAAAAAAAAAAAAA
                 </label>
                 <br>
                 <label>
-                    <input type="radio" name="mode" ng-model="mainCtrl.data.mode" value="2"> Just Display - AAAAAAAAAAAAAAAAAAA
+                    <input type="radio" ng-model="mainCtrl.data.mode" value="2"> Just Display - AAAAAAAAAAAAAAAAAAA
                 </label>
             </div>
             <!-- Message -->
             <div class="form-group">
                 <label for="message" class="control-label">Message</label>
+                <span class="label label-success" ng-show="(mainCtrl.data.mode==0)">Go</span>
+                <span class="label label-danger" ng-show="(mainCtrl.data.mode!=0)">Stop</span>
                 <input type="text" class="form-control" id="message" placeholder="Message" ng-model="mainCtrl.data.message" ng-required="(mainCtrl.data.mode==0)" ng-disabled="(mainCtrl.data.mode!=0)">
             </div>
+            <!-- RowPixels -->
+            <div class="form-group">
+                <label>Pixels</label>
+                <span class="label label-success" ng-show="(mainCtrl.data.mode==2)">Go</span>
+                <span class="label label-danger" ng-show="(mainCtrl.data.mode!=2)">Stop</span>
+                <div ng-repeat="row in mainCtrl.data.rowPixels track by $index">
+                    <span ng-repeat="col in row track by $index">
+                        <input type="checkbox"  ng-model="row[$index]" ng-disabled="(mainCtrl.data.mode!=2)">
+                    </span>
+                </div>
+            </div>
+            <!-- {{mainCtrl.data.rowPixels}} -->
             <!-- Submit -->
             <div class="form-group">
-                <button type="submit" class="btn btn-default">Move it</button>
+                <!-- default -->
+                <button type="button" class="btn btn-default" ng-click="">Random</button>
+                <button type="button" class="btn btn-default" ng-click="mainCtrl.clear()">Clear</button>
+                <button type="submit" class="btn btn-default">Submit</button>
             </div>
         </form>
     </div>
@@ -53,16 +71,35 @@
 
 </html>
 <script>
+//Green 組態
+var GreenMan = {
+    xSize: 3,
+    ySize: 2,
+    width: 4,
+    height: 4
+};
+
+
 angular.module('app', [])
 
 .controller('MainCtrl', ['$http', function($http) {
 
+    //self
     var self = this;
+    var data = self.data = {};
 
+    //rowPixels
+    var rowPixels = self.data.rowPixels = [];
+    for (var y = 0; y < GreenMan.ySize * GreenMan.height; y++) {
+        rowPixels.push([]);
+        for (var x = 0; x < GreenMan.xSize * GreenMan.width; x++) rowPixels[y].push(false);
+    }
+
+    //send
     self.send = function() {
-        console.log(self.data);
+        console.log(data);
 
-        $http.post('/api/form', self.data)
+        $http.post('/api/form', data)
 
         .then(function(resopnse) {
             console.log(resopnse.data);
@@ -70,9 +107,28 @@ angular.module('app', [])
         }, function(err) {
             console.error(err);
         });
-
-
     };
+
+    //clear
+    self.clear = function() {
+        switch (data.mode) {
+            //清除 Message
+            case '0':
+                data.message = '';
+                break;
+            //
+            case '1':
+                break;
+            //清除 rowPixels
+            case '2':
+                for (var y = 0; y < GreenMan.ySize * GreenMan.height; y++) {
+                    for (var x = 0; x < GreenMan.xSize * GreenMan.width; x++) {
+                        rowPixels[y][x] = false;
+                    }
+                }
+                break;
+        }
+    }
 
 }]);
 </script>

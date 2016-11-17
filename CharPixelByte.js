@@ -14,14 +14,12 @@ function getChar5x7(char) {
     var rowPixels = [];
     var index = font.lookup.indexOf(char);
 
-    if (index < 0)
-        return rowPixels;
-    else {
+    //如果找不到字元就用問號代替
+    if (index < 0) index = font.lookup.indexOf('?');
 
-        //取得字元的5x7 pixel資料
-        for (var i = 0; i < 5; i++) rowPixels.push(font.fontData[index * 5 + i]);
-        return rowPixels;
-    }
+    //取得字元的5x7 pixel資料
+    for (var i = 0; i < 5; i++) rowPixels.push(font.fontData[index * 5 + i]);
+    return rowPixels;
 }
 
 function getText5x7(text) {
