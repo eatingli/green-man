@@ -10,7 +10,7 @@
 - 文字跑馬燈
 - LED矩陣展示
 
-## 功能
+## API
 - green-man.js 提供直接傳入像素陣列，與可傳入字串自動轉成像素的功能
 - green-man.js 設定綠巨人矩陣的規格(12x8)，與xy軸的像素位移後，即可產生protocal資料
 - serialport 可將資料透過uart，送給綠巨人
