@@ -1,32 +1,39 @@
 # GreenMan
 
 ## 功能
-- WebApp來操作主要功能
-- 伺服器端為NodeJS，架設在RaspberryPI上，通過Uart控制GreenMan硬體
+- 用來控制GreenMan綠巨人矩陣
+- 提供一個網站來當作主要操作主要介面
+- 伺服器端為NodeJS，架設在RaspberryPI上，底層通過Uart來發送訊號
 
 ## 模式
 - 超音波互動
 - 文字跑馬燈
 - LED矩陣展示
 
-## 使用
-1. 安裝 Modules
+## 佈署
+1. PI必須關閉藍芽，開啟原始uart，編輯/boot/config.txt，加入：
+	
+	```
+	dtoverlay=pi3-miniuart-bt
+	enable_uart=1
+	```
+
+2. 下載所需Modules：
 	
 	```
 	npm install
-
 	```
 
-2. 啟動伺服器
+3. 啟動伺服器：
 
 	```
-	node server.js
+	node server.js <port>
 	```
 
-3. 進入WebApp
+4. 進入操作網站：
 	
 	```
-	網址: 127.0.0.1:8080
+	網址: 127.0.0.1:<port>
 	```
 	
 ## 組態
