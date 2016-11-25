@@ -1,7 +1,7 @@
 # GreenMan
 
 ## 功能
-- 陽春的WebApp來操作主要功能
+- WebApp來操作主要功能
 - 伺服器端為NodeJS，架設在RaspberryPI上，通過Uart控制GreenMan硬體
 
 ## 模式
@@ -10,14 +10,20 @@
 - LED矩陣展示
 
 ## 使用
-1. 啟動伺服器
+1. 安裝 Modules
+	
+	```
+	npm install
 
 	```
-	cd GreenMan
+
+2. 啟動伺服器
+
+	```
 	node server.js
 	```
 
-2. 進入WebApp
+3. 進入WebApp
 	
 	```
 	網址: 127.0.0.1:8080

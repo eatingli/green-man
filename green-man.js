@@ -1,4 +1,4 @@
-var CharPixelByte = require('./CharPixelByte.js');
+var CharPixelByte = require('./char-pixel-byte.js');
 
 var GreenMan = module.exports = function(xSize, ySize, width, height) {
 
@@ -13,12 +13,12 @@ var GreenMan = module.exports = function(xSize, ySize, width, height) {
     this.shiftPositionY = 0;
 }
 
-GreenMan.prototype.resetPosition = function(x, y){
+GreenMan.prototype.resetShiftPosition = function(x, y) {
     this.shiftPositionX = 0;
     this.shiftPositionY = 0;
 }
 
-GreenMan.prototype.shift = function(x, y){
+GreenMan.prototype.shift = function(x, y) {
     this.shiftPositionX += x;
     this.shiftPositionY += y;
 }
