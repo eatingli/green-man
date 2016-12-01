@@ -13,7 +13,7 @@ var GreenMan = module.exports = function(xSize, ySize, width, height) {
     this.shiftPositionY = 0;
 }
 
-GreenMan.prototype.resetShiftPosition = function(x, y) {
+GreenMan.prototype.resetShiftPosition = function() {
     this.shiftPositionX = 0;
     this.shiftPositionY = 0;
 }

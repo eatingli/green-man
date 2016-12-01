@@ -30,18 +30,25 @@
 	npm install
 	```
 
-3. 啟動伺服器：
+3. 測試：
 
 	```
-	node server.js <port>
+	npm run test <serial-port> <baudrate>
 	```
 
-4. 進入操作網站：
+4. 啟動伺服器：
+
+	```
+	node run start <port>
+	```
+
+5. 進入操作網站：
 	
 	```
 	127.0.0.1:<port>
 	```
 	
-## 組態
+## 參考組態
+- Serial-Port /dev/ttyAMA0
 - Baudrate 115200
 - Green 3x2 4x4

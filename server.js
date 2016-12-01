@@ -1,4 +1,4 @@
-var PORT = 8081;
+var port = process.argv[2] || 8085;
 
 var path = require('path');
 var express = require('express');
@@ -17,6 +17,6 @@ router.post('/form', function(req, res, next) {
 
 app.use('/api', router);
 
-app.listen(PORT, function() {
-	console.log('The server listening on port ' + PORT);
+app.listen(port, function() {
+	console.log('The server listening on port ' + port);
 });
