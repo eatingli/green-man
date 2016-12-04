@@ -8,7 +8,7 @@ var baudrate = Number(process.argv[3]) || 115200;
 var greenMan = new GreenMan(3, 2, 4, 4);
 greenMan.setPixelsByText5x7('TEST!');
 greenMan.resetShiftPosition();
-greenMan.shift(2, 0);
+greenMan.shift(1, 0);
 greenMan.printPixels();
 var status = greenMan.getStatus();
 
@@ -19,14 +19,14 @@ GmSerialport.init(portName, baudrate)
 .then(function() {
 
     console.log('open.');
-    var datas = [];
+    var buff = [];
     for (var i = 0; i < 6; i++) {
-        var data = GmProtocal.generateData(i, 2, status[i], 0);
+        var data = GmProtocal.generateData(i + 1, 2, status[i], 0);
         console.log(data);
-        datas = datas.concat(data);
+        buff = buff.concat(data);
     }
 
-    return GmSerialport.write(datas);
+    return GmSerialport.write(buff);
 })
 
 .then(function() {
