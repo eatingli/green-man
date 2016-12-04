@@ -33,13 +33,13 @@
 3. 測試：
 
 	```
-	npm run test <serial-port> <baudrate>
+	sudo npm run test <serial-port> <baudrate>
 	```
 
 4. 啟動伺服器：
 
 	```
-	node run start <port>
+	sudo node run start <port> <serial-port> <baudrate>
 	```
 
 5. 進入操作網站：

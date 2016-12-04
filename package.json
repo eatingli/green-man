@@ -15,6 +15,9 @@
   "devDependencies": {},
   "scripts": {
     "test": "node test/index.js",
+    "test-serialport": "node test/test_serialport.js",
+    "test-protocal": "node test/test_protocal.js",
+    "test-status": "node test/test_status.js",
     "start": "node server.js"
   },
   "author": "eatingli",

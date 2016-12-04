@@ -1,37 +1,35 @@
-var GreenMan = require('../green-man.js');
-var SerialPort = require('serialport');
+var GreenMan = require('../lib/green-man.js');
+var GmProtocal = require('../lib/gm-protocal.js');
+var GmSerialport = require('../lib/gm-serialport.js');
 
 var portName = process.argv[2] || '/dev/ttyAMA0'; //ttyACM0, ttyAMA0 ///dev/ttyACM0
 var baudrate = Number(process.argv[3]) || 115200;
 
-var serialPort = new SerialPort(portName, {
-    baudrate: baudrate,
-    dataBits: 8,
-    parity: 'none',
-    stopBit: '1',
-    flowControl: false,
-    parser: SerialPort.parsers.readline("\n")
-});
-
-
 var greenMan = new GreenMan(3, 2, 4, 4);
+greenMan.setPixelsByText5x7('TEST!');
 greenMan.resetShiftPosition();
-greenMan.setPixelsByText5x7('TEST YA! 中文!');
-greenMan.shift(0, 0);
+greenMan.shift(2, 0);
+greenMan.printPixels();
+var status = greenMan.getStatus();
 
-serialPort.on("open", function() {
-    console.log("onOpen!");
-    setInterval(test, 1500);
-});
 
-serialPort.on('error', function(err) {
-    console.error("error", err);
-});
 
-function test() {
+GmSerialport.init(portName, baudrate)
 
-    greenMan.generateProtocolData().forEach(function(data) {
+.then(function() {
+
+    console.log('open.');
+    var datas = [];
+    for (var i = 0; i < 6; i++) {
+        var data = GmProtocal.generateData(i, 2, status[i], 0);
         console.log(data);
-        for (var d in data) serialPort.write(data[d]);
-    });
-}
+        datas = datas.concat(data);
+    }
+
+    return GmSerialport.write(datas);
+})
+
+.then(function() {
+
+    console.log('ok.');
+});
