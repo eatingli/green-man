@@ -16,44 +16,50 @@
             <h1 class="text-success"><small>so many </small>Green Man</h1>
         </div>
         <!-- 控制表單 -->
-        <form class="form" role="form" ng-submit="mainCtrl.send()" ng-init="mainCtrl.data.mode=0">
+        <form class="form" role="form" ng-submit="mainCtrl.send()" ng-init="mainCtrl.data.fn=0">
             <!-- Mode -->
             <div class="form-group">
                 <label>Function</label>
                 <span class="label label-warning">Watch</span>
                 <br>
                 <label>
-                    <input type="radio" ng-model="mainCtrl.data.mode" value="0"> Static Display - AAAAAAAAAAAAAAAAAAA
+                    <input type="radio" ng-model="mainCtrl.data.fn" value="0"> Static Display - AAAAAAAAAAAAAAAAAAA
                 </label>
                 <br>
                 <label>
-                    <input type="radio" ng-model="mainCtrl.data.mode" value="1"> Scrolling Text - AAAAAAAAAAAAA
+                    <input type="radio" ng-model="mainCtrl.data.fn" value="1"> Scrolling Text - AAAAAAAAAAAAA
                 </label>
                 <br>
                 <label>
-                    <input type="radio" ng-model="mainCtrl.data.mode" value="2"> Ultrasound - AAAAAAAAAAAAAAAAAA
+                    <input type="radio" ng-model="mainCtrl.data.fn" value="2"> Ultrasound - AAAAAAAAAAAAAAAAAA
                 </label>
-                
+                <br>
+                <label>
+                    <input type="radio" ng-model="mainCtrl.data.fn" value="3"> New Frame - AAAAAAAAAAAAAAAAAA
+                </label>
+                <br>
+                <label>
+                    <input type="radio" ng-model="mainCtrl.data.fn" value="4"> Add Frame - AAAAAAAAAAAAAAAAAA
+                </label>
             </div>
             <!-- Message -->
             <div class="form-group">
                 <label for="message" class="control-label">Message</label>
-                <span class="label label-success" ng-show="(mainCtrl.data.mode==1)">Go</span>
-                <span class="label label-danger" ng-show="(mainCtrl.data.mode!=1)">Stop</span>
-                <input type="text" class="form-control" id="message" placeholder="Message" ng-model="mainCtrl.data.message" ng-required="(mainCtrl.data.mode==1)" ng-disabled="(mainCtrl.data.mode!=1)">
+                <span class="label label-success" ng-show="(mainCtrl.data.fn==1)">Go</span>
+                <span class="label label-danger" ng-show="(mainCtrl.data.fn!=1)">Stop</span>
+                <input type="text" class="form-control" id="message" placeholder="Message" ng-model="mainCtrl.data.message" ng-required="(mainCtrl.data.fn==1)" ng-disabled="(mainCtrl.data.fn!=1)">
             </div>
             <!-- RowPixels -->
             <div class="form-group">
                 <label>Pixels</label>
-                <span class="label label-success" ng-show="(mainCtrl.data.mode==0)">Go</span>
-                <span class="label label-danger" ng-show="(mainCtrl.data.mode!=0)">Stop</span>
+                <span class="label label-success" ng-show="(mainCtrl.data.fn==0 || mainCtrl.data.fn==4)">Go</span>
+                <span class="label label-danger" ng-show="(mainCtrl.data.fn!=0 && mainCtrl.data.fn!=4)">Stop</span>
                 <div ng-repeat="row in mainCtrl.data.rowPixels track by $index">
                     <span ng-repeat="col in row track by $index">
-                        <input type="checkbox"  ng-model="row[$index]" ng-disabled="(mainCtrl.data.mode!=0)">
+                        <input type="checkbox"  ng-model="row[$index]" ng-disabled="(mainCtrl.data.fn!=0 && mainCtrl.data.fn!=4)">
                     </span>
                 </div>
             </div>
-            <!-- {{mainCtrl.data.rowPixels}} -->
             <!-- Submit -->
             <div class="form-group">
                 <!-- default -->
@@ -100,28 +106,25 @@ angular.module('app', [])
     self.send = function() {
         console.log(data);
 
-        $http.post('/api/form', data)
+        $http.post('/api/fn/' + data.fn, data)
+            .then(function(resopnse) {
+                console.log(resopnse.data);
 
-        .then(function(resopnse) {
-            console.log(resopnse.data);
-
-        }, function(err) {
-            console.error(err);
-        });
+            }, function(err) {
+                console.error(err);
+            });
     };
 
     //clear
     self.clear = function() {
-        switch (data.mode) {
-            //清除 Message
-            case '0':
+        switch (data.fn) {
+            case '1':
                 data.message = '';
                 break;
-                //
-            case '1':
-                break;
-                //清除 rowPixels
             case '2':
+                break;
+            case '0':
+            case '4':
                 for (var y = 0; y < GreenMan.ySize * GreenMan.height; y++) {
                     for (var x = 0; x < GreenMan.xSize * GreenMan.width; x++) {
                         rowPixels[y][x] = false;

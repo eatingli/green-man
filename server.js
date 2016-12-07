@@ -17,67 +17,79 @@ app.use(bodyParser());
 
 //GreenMan
 var greenMan = new GreenMan(3, 2, 4, 4);
-greenMan.setPixelsByText5x7('Hello');
-greenMan.printPixels();
+//greenMan.setPixelsByText5x7('Hello');
+//greenMan.printPixels();
 
-//SerialPort
-var mode = 2;
+//Buff
+//啟動loop後，會遞迴檢查 buff陣列中有無資料，如果有資料則由serialport送出
 var buff = [];
 
+function putIntoBuff(array) {
+    for (var j = 0; j < array.length; j++) buff.push(array[j]);
+}
+
+function loop() {
+
+    if (buff.length == 0) return setImmediate(loop); // process.nextTick(loop); 
+
+    //console.log(buff)
+    GmSerialport.write(buff)
+        .then(function() {
+            console.log('serialport has writed.');
+            setImmediate(loop)
+        });
+
+    buff.length = 0;
+}
+
 //Anima
-var anima = new GmAnima(1000, 50, function() {
+var delay = 900;
+var clearDelay = 50
+var anima = new GmAnima(delay, clearDelay, draw, clear);
+
+function draw() {
 
     //將frame填入buff
     var frame = anima.getNowFrame();
     for (var i = 0; i < 6; i++) {
-        //if (i < 5) continue; //test
         var data = GmProtocal.generateData(i + 1, 2, frame[i], 0);
-        for (var j = 0; j < data.length; j++) buff.push(data[j]);
+        putIntoBuff(data);
         console.log(data);
     }
     //greenMan.printPixels();
-}, function() {
+    console.log("protocol frame pixel.");
+}
+
+function clear() {
+
     for (var i = 0; i < 6; i++) {
-        //if (i < 5) continue; //test
         var data = GmProtocal.generateData(i + 1, 2, [0x00, 0x00, 0x00, 0x00, 0x00, 0x00], 0);
-        for (var j = 0; j < data.length; j++) buff.push(data[j]);
-        console.log(data);
+        putIntoBuff(data);
+        //console.log(data);
     }
-});
+    console.log("protocol clear.");
+}
 
-
-//捲動timer
-var scrollingInterval = null;
-var scrollingTimesCount = 0;
-
-router.post('/form', function(req, res, next) {
+//Server
+router.post('/fn/:fn', function(req, res, next) {
     var data = req.body;
-    mode = +data.mode;
-
-    //清除捲動 Interval
-    if (scrollingInterval) {
-        clearInterval(scrollingInterval);
-        scrollingInterval = null;
-    }
+    var fn = +req.params.fn;
 
     anima.stop();
 
     //0:靜態展示/ 1:跑馬燈/ 2:超音波
-    switch (mode) {
+    switch (fn) {
         case 0:
             console.log('靜態展示');
             greenMan.setPixels(data.rowPixels);
             greenMan.resetShiftPosition();
-            //protoaclStaticDisplay();
             anima.setFrames([greenMan.getStatus()]);
-            anima.doClear = false;
             anima.start();
             break;
         case 1:
             console.log('文字捲動');
             greenMan.setPixelsByText5x7(data.message);
             greenMan.setShiftPosition(-6, 0);
-            //startScroll(1, 0, greenMan.rowPixels[0].length * 2 + 2, 1300, protoaclScrolling);
             var frames = [];
             var frameCount = greenMan.rowPixels[0].length + 7;
             for (var i = 0; i < frameCount; i++) {
@@ -86,16 +98,28 @@ router.post('/form', function(req, res, next) {
             }
 
             anima.setFrames(frames);
-            anima.doClear = true;
             anima.start();
             break;
         case 2:
-            protoaclUltrasound();
+            console.log('超音波');
+            for (var i = 0; i < 6; i++) {
+                var data = GmProtocal.generateData(i + 1, 1, 0, 0);
+                putIntoBuff(data);
+                console.log(data);
+            }
             break;
         case 3:
-            var frames = [];
-            frames.push([0b0000000000001111, 0b0000000000001111, 0b0000000000001111, 0, 0, 0]);
+            console.log('New Frame');
+            anima.setFrames([]);
             break;
+        case 4:
+            console.log('Add Frame');
+            greenMan.setPixels(data.rowPixels);
+            greenMan.resetShiftPosition();
+            anima.frames.push(greenMan.getStatus());
+            anima.start();
+            break;
+
     }
     res.send('success');
 });
@@ -107,85 +131,12 @@ app.listen(port, function() {
 });
 
 
-function protoaclUltrasound() {
-    console.log('超音波');
-    for (var i = 0; i < 6; i++) {
-        var data = GmProtocal.generateData(i + 1, 1, 0, 0);
-        addToBuff(data);
-        console.log(data);
-    }
-}
-
-
-function protoaclScrolling() {
-    console.log('捲動');
-    var status = greenMan.getStatus();
-    for (var i = 0; i < 6; i++) {
-        var data = GmProtocal.generateData(i + 1, 2, status[i], status[i]);
-        addToBuff(data);
-        console.log(data);
-    }
-    greenMan.printPixels();
-}
-
-function protoaclStaticDisplay() {
-    console.log('靜態展示');
-    var status = greenMan.getStatus();
-    for (var i = 0; i < 6; i++) {
-        var data = GmProtocal.generateData(i + 1, 2, status[i], status[i]);
-        addToBuff(data);
-        console.log(data);
-    }
-    greenMan.printPixels();
-}
-
-function addToBuff(data) {
-    for (var i = 0; i < data.length; i++) buff.push(data[i]);
-}
-
-
-function startScroll(x, y, times, delay, loop) {
-
-    scrollingTimesCount = 0;
-    scrollingInterval = setInterval(function() {
-
-        if (++scrollingTimesCount == times) {
-            greenMan.shift(x * times * -1, y * times * -1);
-            scrollingTimesCount = 0;
-        } else greenMan.shift(x, y);
-
-        loop();
-
-    }, delay);
-}
-
-
-
-//clearInterval(scrollingInterval);
-
-//loop
-function loop() {
-
-    if (buff.length == 0) return setImmediate(loop); // process.nextTick(loop); 
-    //console.log(buff)
-    console.log('serialport write\n');
-
-    GmSerialport.write(buff)
-        .then(function() {
-            setImmediate(loop)
-        });
-
-    buff.length = 0;
-}
 
 //start
 GmSerialport.init(portName, baudrate)
     .then(function() {
         console.log('open.');
         loop();
-        /*
-        setInterval(function() {
-        	buff.push(5);
-        }, 1500);
-        */
+    }, function(err) {
+        console.error(err);
     });
